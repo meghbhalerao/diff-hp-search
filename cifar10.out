@@ -1,0 +1,32 @@
+/home/megh/projects/diff-hp-search/utils/operations.py:10: UserWarning: This overload of add_ is deprecated:
+	add_(Number alpha, Tensor other)
+Consider using one of the following signatures instead:
+	add_(Tensor other, *, Number alpha) (Triggered internally at  /opt/conda/conda-bld/pytorch_1603729047590/work/torch/csrc/utils/python_arg_parser.cpp:882.)
+  p.data.add_(R, v)
+tensor([1.0000, 1.0001, 0.9998,  ..., 1.0000, 1.0000, 1.0000])
+
+Test set: Average loss: 1.6662, Accuracy: 16663/45056 F1 (37%)
+
+36.98286576704545 tensor(1.6662, device='cuda:0')
+
+Test set: Average loss: 1.6406, Accuracy: 1867/4864 F1 (38%)
+
+tensor(1.6406, device='cuda:0') 38.38404605263158
+tensor([1.2015, 1.0335, 0.9055,  ..., 1.0000, 1.0000, 1.0000])
+
+Test set: Average loss: 1.5512, Accuracy: 19271/45056 F1 (43%)
+
+42.77121803977273 tensor(1.5512, device='cuda:0')
+
+Test set: Average loss: 1.4912, Accuracy: 2230/4864 F1 (46%)
+
+tensor(1.4912, device='cuda:0') 45.84703947368421
+tensor([0.6052, 0.8777, 1.3898,  ..., 1.0000, 1.0000, 1.0000])
+
+Test set: Average loss: 1.3170, Accuracy: 23018/45056 F1 (51%)
+
+51.08753551136363 tensor(1.3170, device='cuda:0')
+
+Test set: Average loss: 1.2840, Accuracy: 2574/4864 F1 (53%)
+
+tensor(1.2840, device='cuda:0') 52.91940789473684

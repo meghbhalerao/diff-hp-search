@@ -47,15 +47,18 @@ def main():
     best_acc = 0
     best_ep = 0
     for epoch in range(num_epochs):
+        print("Epoch #: ", epoch)
         train_loss, train_acc = train(model, train_loader, val_loader, criterion, weight_bank, optimizer)
-        print(train_acc, train_loss)
+        print("Train Acc: ", train_acc, "Train Loss: ", train_loss)
         val_loss, val_acc = val(model, val_loader, criterion)
-        print(val_loss, val_acc)
+        print("Val Loss: ", val_loss,"Val Acc: ", val_acc)
         # Initialize the train_loader here again
+        print("Saving model ...")
         if val_acc > best_acc:
             best_acc = val_acc
             best_ep = epoch
             torch.save({'epoch': epoch, 'val_acc': val_acc, 'val_loss': val_loss, 'model': model.state_dict()}, "./model_weights/model_best.ckpt.best.pth.tar")
+            torch.save(weight_bank,"weight_bank.pth")
 
         scheduler.step()
 
@@ -85,6 +88,7 @@ def train(model, train_loader, val_loader, criterion, weight_bank, optimizer):
         weight_bank[idx * batch_size: (idx + 1) * batch_size] = weight
         optimizer.step()
         optimizer.zero_grad()
+
     print(weight_bank)
     train_loader.dataset.weight_sample = weight_bank
     train_loss, train_acc = get_acc(model, criterion, train_loader)
@@ -116,10 +120,7 @@ def get_acc(model, criterion, loader):
                 confusion_matrix[t.long(), p.long()] += 1
             correct += pred1.eq(gt_labels.data).cpu().sum()
             test_loss += criterion(output1, gt_labels, weight) / len(loader)
-    print('\nTest set: Average loss: {:.4f}, '
-          'Accuracy: {}/{} F1 ({:.0f}%)\n'.
-          format(test_loss, correct, size,
-                 100. * correct / size))
+    #print('\nTest set: Average loss: {:.4f}, ''Accuracy: {}/{} F1 ({:.0f}%)\n'.format(test_loss, correct, size, 100. * correct / size))
     return test_loss.data, 100. * float(correct) / size
 
 
