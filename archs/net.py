@@ -1,27 +1,37 @@
 import torch.nn as nn
 from torchvision import models
+import torch.nn.functional as F
 
-
-class AlexNetBase(nn.Module):
-    def __init__(self, num_classes = 10,  pret=True):
-        super(AlexNetBase, self).__init__()
-        self.num_classes = num_classes
-        model_alexnet = models.alexnet(pretrained=pret)
-        self.features = nn.Sequential(*list(model_alexnet.
-                                            features._modules.values())[:])
-        self.classifier = nn.Sequential()
-        for i in range(6):
-            self.classifier.add_module("classifier" + str(i),
-                                       model_alexnet.classifier[i])
-        self.__in_features = model_alexnet.classifier[6].in_features
-        self.last_classifier = nn.Linear(4096,self.num_classes)
+class AlexNet(nn.Module):
+    def __init__(self, num_classes=10):
+        super(AlexNet, self).__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=3, stride=2, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Conv2d(64, 192, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2),
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=2),
+        )
+        self.classifier = nn.Sequential(
+            nn.Dropout(),
+            nn.Linear(256 * 2 * 2, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_classes),
+        )
 
     def forward(self, x):
         x = self.features(x)
-        x = x.view(x.size(0), 256 * 6 * 6)
+        x = x.view(x.size(0), 256 * 2 * 2)
         x = self.classifier(x)
-        x = self.last_classifier(x)
         return x
-
-    def output_num(self):
-        return self.__in_features
