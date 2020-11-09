@@ -1,3 +1,4 @@
+from os import access
 import torch
 import torchvision.transforms as transforms
 import torch.nn as nn
@@ -7,6 +8,7 @@ import argparse
 from loaders.dataset import *
 from archs.net import * 
 from utils.losses import *
+from utils.operations import *
 
 parser = argparse.ArgumentParser(description='Train model with')
 
@@ -43,18 +45,61 @@ def main():
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, float(num_epochs), eta_min=learning_rate_min)
 
     for epoch in range(num_epochs):
-        train(model, train_loader, val_loader, criterion)
-        val()
+        train_loss, train_acc = train(model, train_loader, val_loader, criterion)
+        val_loss, val_acc = val(model, val_loader, criterion)
         scheduler.step()
 
 def train(model, train_loader, val_loader, criterion):
+    model.train()
     for idx, (img, targets, weight, _) in enumerate(train_loader):
+        input_search, target_search, _ , _ = next(iter(val_loader)) # Querying the validation image and targets to update A
         logits = model(img.cuda())
-        print(criterion(logits,targets))
-    return 0
+        loss_weights = criterion(logits,targets.cuda(),weight.cuda())
+        loss_weights.backward() # Updating model 1 time
+        # Update A
+        model_params_vector = [v.grad.data for v in model.parameters()]
+        gradients = hessian_vector_product(model, model_params_vector, img, targets)
+        print(gradients)
 
-def val():
-    pass
+
+        # Update W 
+        print("")
+
+    train_loss, train_acc = get_acc(model, criterion, train_loader)
+    return train_loss, train_acc
+
+def val(model, val_loader, criterion):
+    model.eval()
+    val_loss, val_acc = get_acc(model, criterion, val_loader)
+    return val_loss, val_acc
+
+def get_acc(model, criterion, loader):
+    model.eval()
+    test_loss = 0
+    correct = 0
+    size = 0
+    num_class = 10
+    output_all = np.zeros((0, num_class))
+    confusion_matrix = torch.zeros(num_class, num_class)
+    with torch.no_grad():
+        for batch_idx, data in enumerate(loader):
+            im_data = data[0]
+            gt_labels  = data[1]
+            output1 = model(im_data)
+            output_all = np.r_[output_all, output1.data.cpu().numpy()]
+            size += im_data.size(0)
+            pred1 = output1.data.max(1)[1]
+            for t, p in zip(gt_labels.view(-1), pred1.view(-1)):
+                confusion_matrix[t.long(), p.long()] += 1
+            correct += pred1.eq(gt_labels.data).cpu().sum()
+            test_loss += criterion(output1, gt_labels) / len(loader)
+    print('\nTest set: Average loss: {:.4f}, '
+          'Accuracy: {}/{} F1 ({:.0f}%)\n'.
+          format(test_loss, correct, size,
+                 100. * correct / size))
+    return test_loss.data, 100. * float(correct) / size
+
+
 
 if __name__ == "__main__":
     main()
