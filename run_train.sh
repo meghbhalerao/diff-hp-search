@@ -1,1 +1,1 @@
-CUDA_VISIBLE_DEVICES=1 python main_hp.py 
+CUDA_VISIBLE_DEVICES=0 python main_hp.py 

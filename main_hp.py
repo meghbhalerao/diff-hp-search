@@ -9,6 +9,7 @@ from loaders.dataset import *
 from archs.net import * 
 from utils.losses import *
 from utils.operations import *
+from copy import deepcopy
 
 parser = argparse.ArgumentParser(description='Train model with')
 
@@ -32,9 +33,9 @@ def main():
     train_data = Imagelists(image_list = os.path.join("./data/cifar/lists/train.txt"),weight_sample = weight_sample, root="./data/cifar/train/", transform=transform_train)
     val_data = Imagelists(image_list = os.path.join("./data/cifar/lists/val.txt"), weight_sample = weight_sample, root="./data/cifar/train/", transform=transform_val)
 
-    train_loader = torch.utils.data.DataLoader(train_data, batch_size=128, shuffle=True, num_workers=2)
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size=128, shuffle=True, num_workers=2, drop_last = True)
 
-    val_loader = torch.utils.data.DataLoader(val_data, batch_size=100, shuffle=False, num_workers=2)
+    val_loader = torch.utils.data.DataLoader(val_data, batch_size=128, shuffle=False, num_workers=2, drop_last = True)
 
     criterion = CE_Mask().cuda()
     model = AlexNet(criterion = CE_Mask, num_classes = 10).cuda()
@@ -42,28 +43,40 @@ def main():
     num_epochs = 100
     learning_rate_min =  0.001
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, float(num_epochs), eta_min=learning_rate_min)
+    weight_bank = weight_sample
 
     for epoch in range(num_epochs):
-        train_loss, train_acc = train(model, train_loader, val_loader, criterion)
+        train_loss, train_acc, weight_bank = train(model, train_loader, val_loader, criterion, weight_bank)
         val_loss, val_acc = val(model, val_loader, criterion)
+        # Initialize the train_loader here again
+        train_loader.dataset.weight_sample = weight_bank
         scheduler.step()
 
-def train(model, train_loader, val_loader, criterion):
+def train(model, train_loader, val_loader, criterion, weight_bank):
     model.train()
+    batch_size = train_loader.batch_size
     for idx, (img, targets, weight, _) in enumerate(train_loader):
         img, targets, weight = img.cuda(), targets.cuda(), weight.cuda()
         weight.requires_grad = True
         input_search, target_search, _ , _ = next(iter(val_loader)) # Querying the validation image and targets to update A
+        input_search, target_search = input_search.cuda(), target_search.cuda()
         logits = model(img)
         loss_weights = criterion(logits,targets.cuda(),weight.cuda())
         loss_weights.backward() # Updating model 1 time
-        # Update A
-        model_grad_vector = [v.grad.data for v in model.parameters()]
-        gradients = hessian_vector_product(model, model_grad_vector, img, targets, weight)
-        weight = weight + gradients.detach()
+        
+        # Making a separate object for a one step unrolled model
+        unrolled_model = deepcopy(model)
+        unrolled_loss = unrolled_model._loss(input_search, target_search, weight)
+        unrolled_loss.backward()
 
-        # Update W 
-        print("")
+        # Update A i.e. weights for the loss functions
+        unrolled_model_grad_vector = [v.grad.data for v in unrolled_model.parameters()]
+        gradients = hessian_vector_product(model, unrolled_model_grad_vector, img, targets, weight)
+        weight = weight - gradients[0]
+        weight = weight.detach()
+        weight.requires_grad = False
+        weight_bank[idx * batch_size: (idx + 1) * batch_size] = weight
+        print(weight_bank)
 
     train_loss, train_acc = get_acc(model, criterion, train_loader)
     return train_loss, train_acc
