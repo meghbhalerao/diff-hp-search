@@ -3,7 +3,7 @@ from torchvision import models
 import torch.nn.functional as F
 
 class AlexNet(nn.Module):
-    def __init__(self, num_classes=10):
+    def __init__(self,criterion, num_classes=10):
         super(AlexNet, self).__init__()
         self.features = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=3, stride=2, padding=1),
@@ -29,9 +29,14 @@ class AlexNet(nn.Module):
             nn.ReLU(inplace=True),
             nn.Linear(4096, num_classes),
         )
+        self._criterion = criterion()
 
     def forward(self, x):
         x = self.features(x)
         x = x.view(x.size(0), 256 * 2 * 2)
         x = self.classifier(x)
         return x
+
+    def _loss(self, input, target, mask):
+        logits = self(input)
+        return self._criterion(logits, target, mask) 

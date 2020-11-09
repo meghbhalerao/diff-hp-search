@@ -5,8 +5,8 @@ class CE_Mask(nn.Module):
     def __init__(self, reduction = 'none'):
         super(CE_Mask,self).__init__()
         self.reduction = reduction
-        self.criterion = nn.CrossEntropyLoss(reduction = self.reduction)
+        self.criterion_ce = nn.CrossEntropyLoss(reduction = self.reduction)
 
     def forward(self, input, target, mask):
-        ce_loss = torch.mean(mask * self.criterion(input,target))
+        ce_loss = torch.mean(mask * self.criterion_ce(input,target))
         return ce_loss

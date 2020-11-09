@@ -36,9 +36,8 @@ def main():
 
     val_loader = torch.utils.data.DataLoader(val_data, batch_size=100, shuffle=False, num_workers=2)
 
-    model = AlexNet().cuda()
-
     criterion = CE_Mask().cuda()
+    model = AlexNet(criterion = CE_Mask, num_classes = 10).cuda()
     optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
     num_epochs = 100
     learning_rate_min =  0.001
@@ -52,15 +51,16 @@ def main():
 def train(model, train_loader, val_loader, criterion):
     model.train()
     for idx, (img, targets, weight, _) in enumerate(train_loader):
+        img, targets, weight = img.cuda(), targets.cuda(), weight.cuda()
+        weight.requires_grad = True
         input_search, target_search, _ , _ = next(iter(val_loader)) # Querying the validation image and targets to update A
-        logits = model(img.cuda())
+        logits = model(img)
         loss_weights = criterion(logits,targets.cuda(),weight.cuda())
         loss_weights.backward() # Updating model 1 time
         # Update A
-        model_params_vector = [v.grad.data for v in model.parameters()]
-        gradients = hessian_vector_product(model, model_params_vector, img, targets)
-        print(gradients)
-
+        model_grad_vector = [v.grad.data for v in model.parameters()]
+        gradients = hessian_vector_product(model, model_grad_vector, img, targets, weight)
+        weight = weight + gradients.detach()
 
         # Update W 
         print("")
