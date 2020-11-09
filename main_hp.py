@@ -44,15 +44,22 @@ def main():
     learning_rate_min =  0.001
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, float(num_epochs), eta_min=learning_rate_min)
     weight_bank = weight_sample
-
+    best_acc = 0
+    best_ep = 0
     for epoch in range(num_epochs):
-        train_loss, train_acc, weight_bank = train(model, train_loader, val_loader, criterion, weight_bank)
+        train_loss, train_acc = train(model, train_loader, val_loader, criterion, weight_bank, optimizer)
+        print(train_acc, train_loss)
         val_loss, val_acc = val(model, val_loader, criterion)
+        print(val_loss, val_acc)
         # Initialize the train_loader here again
-        train_loader.dataset.weight_sample = weight_bank
+        if val_acc > best_acc:
+            best_acc = val_acc
+            best_ep = epoch
+            torch.save({'epoch': epoch, 'val_acc': val_acc, 'val_loss': val_loss, 'model': model.state_dict()}, "./model_weights/model_best.ckpt.best.pth.tar")
+
         scheduler.step()
 
-def train(model, train_loader, val_loader, criterion, weight_bank):
+def train(model, train_loader, val_loader, criterion, weight_bank, optimizer):
     model.train()
     batch_size = train_loader.batch_size
     for idx, (img, targets, weight, _) in enumerate(train_loader):
@@ -64,7 +71,7 @@ def train(model, train_loader, val_loader, criterion, weight_bank):
         loss_weights = criterion(logits,targets.cuda(),weight.cuda())
         loss_weights.backward() # Updating model 1 time
         
-        # Making a separate object for a one step unrolled model
+        # Making a separate netowork for a one step unrolled model
         unrolled_model = deepcopy(model)
         unrolled_loss = unrolled_model._loss(input_search, target_search, weight)
         unrolled_loss.backward()
@@ -76,8 +83,10 @@ def train(model, train_loader, val_loader, criterion, weight_bank):
         weight = weight.detach()
         weight.requires_grad = False
         weight_bank[idx * batch_size: (idx + 1) * batch_size] = weight
-        print(weight_bank)
-
+        optimizer.step()
+        optimizer.zero_grad()
+    print(weight_bank)
+    train_loader.dataset.weight_sample = weight_bank
     train_loss, train_acc = get_acc(model, criterion, train_loader)
     return train_loss, train_acc
 
@@ -96,8 +105,9 @@ def get_acc(model, criterion, loader):
     confusion_matrix = torch.zeros(num_class, num_class)
     with torch.no_grad():
         for batch_idx, data in enumerate(loader):
-            im_data = data[0]
-            gt_labels  = data[1]
+            im_data = data[0].cuda()
+            gt_labels  = data[1].cuda()
+            weight = data[2].cuda()
             output1 = model(im_data)
             output_all = np.r_[output_all, output1.data.cpu().numpy()]
             size += im_data.size(0)
@@ -105,7 +115,7 @@ def get_acc(model, criterion, loader):
             for t, p in zip(gt_labels.view(-1), pred1.view(-1)):
                 confusion_matrix[t.long(), p.long()] += 1
             correct += pred1.eq(gt_labels.data).cpu().sum()
-            test_loss += criterion(output1, gt_labels) / len(loader)
+            test_loss += criterion(output1, gt_labels, weight) / len(loader)
     print('\nTest set: Average loss: {:.4f}, '
           'Accuracy: {}/{} F1 ({:.0f}%)\n'.
           format(test_loss, correct, size,
