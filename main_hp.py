@@ -5,6 +5,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import os
+import math
 import argparse
 from loaders.dataset import *
 from archs.net import * 
@@ -77,7 +78,7 @@ def train(model, train_loader, val_loader, criterion, weight_bank, optimizer):
         loss_weights = criterion(logits,targets.cuda(),weight.cuda())
         loss_weights.backward() # Updating model 1 time
         
-        # Making a separate netowork for a one step unrolled model
+        # Making a separate network for a one step unrolled model
         unrolled_model = deepcopy(model)
         unrolled_loss = unrolled_model._loss(input_search, target_search, weight)
         unrolled_loss.backward()
@@ -91,8 +92,9 @@ def train(model, train_loader, val_loader, criterion, weight_bank, optimizer):
         weight_bank[idx * batch_size: (idx + 1) * batch_size] = weight
         optimizer.step()
         optimizer.zero_grad()
+        unrolled_model.zero_grad()
 
-    weight_bank = F.sigmoid(weight_bank) # Squeezing the weight values between 0 and 1 to make it like a probablity 
+    weight_bank = ((math.exp(1) + 1)/math.exp(1)) * torch.sigmoid(weight_bank) # Squeezing the weight values between 0 and 1 to make it like a probablity 
     print(weight_bank)
     train_loader.dataset.weight_sample = weight_bank
     train_loss, train_acc = get_acc(model, criterion, train_loader)
