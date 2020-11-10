@@ -1,32 +1,607 @@
+Epoch #:  0
 /home/megh/projects/diff-hp-search/utils/operations.py:10: UserWarning: This overload of add_ is deprecated:
 	add_(Number alpha, Tensor other)
 Consider using one of the following signatures instead:
 	add_(Tensor other, *, Number alpha) (Triggered internally at  /opt/conda/conda-bld/pytorch_1603729047590/work/torch/csrc/utils/python_arg_parser.cpp:882.)
   p.data.add_(R, v)
-tensor([1.0000, 1.0001, 0.9998,  ..., 1.0000, 1.0000, 1.0000])
-
-Test set: Average loss: 1.6662, Accuracy: 16663/45056 F1 (37%)
-
-36.98286576704545 tensor(1.6662, device='cuda:0')
-
-Test set: Average loss: 1.6406, Accuracy: 1867/4864 F1 (38%)
-
-tensor(1.6406, device='cuda:0') 38.38404605263158
-tensor([1.2015, 1.0335, 0.9055,  ..., 1.0000, 1.0000, 1.0000])
-
-Test set: Average loss: 1.5512, Accuracy: 19271/45056 F1 (43%)
-
-42.77121803977273 tensor(1.5512, device='cuda:0')
-
-Test set: Average loss: 1.4912, Accuracy: 2230/4864 F1 (46%)
-
-tensor(1.4912, device='cuda:0') 45.84703947368421
-tensor([0.6052, 0.8777, 1.3898,  ..., 1.0000, 1.0000, 1.0000])
-
-Test set: Average loss: 1.3170, Accuracy: 23018/45056 F1 (51%)
-
-51.08753551136363 tensor(1.3170, device='cuda:0')
-
-Test set: Average loss: 1.2840, Accuracy: 2574/4864 F1 (53%)
-
-tensor(1.2840, device='cuda:0') 52.91940789473684
+tensor([0.7312, 0.7310, 0.7311,  ..., 0.7311, 0.7311, 0.7311])
+/home/megh/anaconda3/envs/ssal/lib/python3.7/site-packages/torch/nn/functional.py:1639: UserWarning: nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.
+  warnings.warn("nn.functional.sigmoid is deprecated. Use torch.sigmoid instead.")
+Train Acc:  28.819691051136363 Train Loss:  1.332716941833496
+Val Acc:  30.18092105263158 Val Loss:  1.819125771522522
+Saving model ...
+Best Val Acc:  30.18092105263158
+Epoch #:  1
+tensor([0.6661, 0.6811, 0.6703,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  42.07652698863637 Train Loss:  1.0354816913604736
+Val Acc:  42.7014802631579 Val Loss:  1.1038532257080078
+Saving model ...
+Best Val Acc:  42.7014802631579
+Epoch #:  2
+tensor([0.6443, 0.6706, 0.6804,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  50.25079900568182 Train Loss:  0.9124953150749207
+Val Acc:  51.891447368421055 Val Loss:  0.9034068584442139
+Saving model ...
+Best Val Acc:  51.891447368421055
+Epoch #:  3
+tensor([0.6672, 0.6424, 0.6746,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  52.7587890625 Train Loss:  0.8718092441558838
+Val Acc:  53.72121710526316 Val Loss:  0.8559684157371521
+Saving model ...
+Best Val Acc:  53.72121710526316
+Epoch #:  4
+tensor([0.6554, 0.6550, 0.6734,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  59.08868963068182 Train Loss:  0.7671244144439697
+Val Acc:  61.01973684210526 Val Loss:  0.7368072867393494
+Saving model ...
+Best Val Acc:  61.01973684210526
+Epoch #:  5
+tensor([0.6624, 0.6245, 0.6998,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  58.20756392045455 Train Loss:  0.7795460224151611
+Val Acc:  59.4983552631579 Val Loss:  0.7467552423477173
+Saving model ...
+Best Val Acc:  61.01973684210526
+Epoch #:  6
+tensor([0.6499, 0.6082, 0.6628,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  62.7685546875 Train Loss:  0.697149395942688
+Val Acc:  63.7952302631579 Val Loss:  0.6917789578437805
+Saving model ...
+Best Val Acc:  63.7952302631579
+Epoch #:  7
+tensor([0.6382, 0.6541, 0.6517,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  63.25905539772727 Train Loss:  0.6958471536636353
+Val Acc:  62.911184210526315 Val Loss:  0.6894042491912842
+Saving model ...
+Best Val Acc:  63.7952302631579
+Epoch #:  8
+tensor([0.6598, 0.6377, 0.6806,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  64.1446200284091 Train Loss:  0.6778019070625305
+Val Acc:  64.5970394736842 Val Loss:  0.666803777217865
+Saving model ...
+Best Val Acc:  64.5970394736842
+Epoch #:  9
+tensor([0.7059, 0.5879, 0.7126,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  67.57368607954545 Train Loss:  0.6227574944496155
+Val Acc:  67.59868421052632 Val Loss:  0.5997312068939209
+Saving model ...
+Best Val Acc:  67.59868421052632
+Epoch #:  10
+tensor([0.6663, 0.6229, 0.6167,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  69.4424715909091 Train Loss:  0.5928490161895752
+Val Acc:  69.94243421052632 Val Loss:  0.5816466212272644
+Saving model ...
+Best Val Acc:  69.94243421052632
+Epoch #:  11
+tensor([0.6761, 0.6551, 0.7331,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  66.50612571022727 Train Loss:  0.6475532054901123
+Val Acc:  66.87911184210526 Val Loss:  0.6282917261123657
+Saving model ...
+Best Val Acc:  69.94243421052632
+Epoch #:  12
+tensor([0.6640, 0.6969, 0.6196,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  71.0360440340909 Train Loss:  0.563888669013977
+Val Acc:  71.40213815789474 Val Loss:  0.5494951009750366
+Saving model ...
+Best Val Acc:  71.40213815789474
+Epoch #:  13
+tensor([0.6776, 0.6528, 0.6589,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  69.6621981534091 Train Loss:  0.572627067565918
+Val Acc:  68.91447368421052 Val Loss:  0.5876376032829285
+Saving model ...
+Best Val Acc:  71.40213815789474
+Epoch #:  14
+tensor([0.6748, 0.6326, 0.6589,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  73.8125887784091 Train Loss:  0.5126382112503052
+Val Acc:  74.21875 Val Loss:  0.5205515027046204
+Saving model ...
+Best Val Acc:  74.21875
+Epoch #:  15
+tensor([0.6822, 0.6145, 0.6373,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  71.65971235795455 Train Loss:  0.5544396638870239
+Val Acc:  71.31990131578948 Val Loss:  0.5600918531417847
+Saving model ...
+Best Val Acc:  74.21875
+Epoch #:  16
+tensor([0.6410, 0.6064, 0.6627,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  72.2012606534091 Train Loss:  0.54140704870224
+Val Acc:  71.484375 Val Loss:  0.5468312501907349
+Saving model ...
+Best Val Acc:  74.21875
+Epoch #:  17
+tensor([0.6499, 0.6450, 0.6576,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  73.87917258522727 Train Loss:  0.5134319067001343
+Val Acc:  73.54029605263158 Val Loss:  0.5129028558731079
+Saving model ...
+Best Val Acc:  74.21875
+Epoch #:  18
+tensor([0.6448, 0.6593, 0.6310,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  73.75710227272727 Train Loss:  0.5111060738563538
+Val Acc:  73.60197368421052 Val Loss:  0.5157493948936462
+Saving model ...
+Best Val Acc:  74.21875
+Epoch #:  19
+tensor([0.6590, 0.6627, 0.6084,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  73.83478338068181 Train Loss:  0.4987622797489166
+Val Acc:  73.72532894736842 Val Loss:  0.5059504508972168
+Saving model ...
+Best Val Acc:  74.21875
+Epoch #:  20
+tensor([0.6601, 0.6628, 0.6639,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  74.99556107954545 Train Loss:  0.4813638925552368
+Val Acc:  74.69161184210526 Val Loss:  0.4825667440891266
+Saving model ...
+Best Val Acc:  74.69161184210526
+Epoch #:  21
+tensor([0.7120, 0.6323, 0.7132,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  72.95365767045455 Train Loss:  0.517767608165741
+Val Acc:  73.17023026315789 Val Loss:  0.5036791563034058
+Saving model ...
+Best Val Acc:  74.69161184210526
+Epoch #:  22
+tensor([0.6397, 0.6701, 0.5980,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  73.53737571022727 Train Loss:  0.5100284218788147
+Val Acc:  73.00575657894737 Val Loss:  0.5296658277511597
+Saving model ...
+Best Val Acc:  74.69161184210526
+Epoch #:  23
+tensor([0.6336, 0.6697, 0.6596,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  76.37384588068181 Train Loss:  0.45806458592414856
+Val Acc:  74.50657894736842 Val Loss:  0.47775763273239136
+Saving model ...
+Best Val Acc:  74.69161184210526
+Epoch #:  24
+tensor([0.6307, 0.6859, 0.6521,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  76.9442471590909 Train Loss:  0.4493507146835327
+Val Acc:  75.390625 Val Loss:  0.46282610297203064
+Saving model ...
+Best Val Acc:  75.390625
+Epoch #:  25
+tensor([0.7098, 0.7430, 0.6533,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  74.95783025568181 Train Loss:  0.48683714866638184
+Val Acc:  74.38322368421052 Val Loss:  0.5027711391448975
+Saving model ...
+Best Val Acc:  75.390625
+Epoch #:  26
+tensor([0.6582, 0.6546, 0.6131,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  76.318359375 Train Loss:  0.46534499526023865
+Val Acc:  75.30838815789474 Val Loss:  0.46438759565353394
+Saving model ...
+Best Val Acc:  75.390625
+Epoch #:  27
+tensor([0.6613, 0.6322, 0.6631,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  77.51242897727273 Train Loss:  0.4399939179420471
+Val Acc:  76.50082236842105 Val Loss:  0.467970609664917
+Saving model ...
+Best Val Acc:  76.50082236842105
+Epoch #:  28
+tensor([0.6547, 0.7146, 0.6585,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  76.97975852272727 Train Loss:  0.44554999470710754
+Val Acc:  75.26726973684211 Val Loss:  0.4650188088417053
+Saving model ...
+Best Val Acc:  76.50082236842105
+Epoch #:  29
+tensor([0.6486, 0.6589, 0.6012,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  76.77112926136364 Train Loss:  0.4439627230167389
+Val Acc:  75.34950657894737 Val Loss:  0.4752112329006195
+Saving model ...
+Best Val Acc:  76.50082236842105
+Epoch #:  30
+tensor([0.6595, 0.6506, 0.7583,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  77.77210582386364 Train Loss:  0.41981813311576843
+Val Acc:  76.4185855263158 Val Loss:  0.4511871933937073
+Saving model ...
+Best Val Acc:  76.50082236842105
+Epoch #:  31
+tensor([0.6586, 0.6576, 0.6423,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  76.92649147727273 Train Loss:  0.44561174511909485
+Val Acc:  76.00740131578948 Val Loss:  0.467038631439209
+Saving model ...
+Best Val Acc:  76.50082236842105
+Epoch #:  32
+tensor([0.6639, 0.6829, 0.5846,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  78.30921519886364 Train Loss:  0.41948196291923523
+Val Acc:  76.76809210526316 Val Loss:  0.45166242122650146
+Saving model ...
+Best Val Acc:  76.76809210526316
+Epoch #:  33
+tensor([0.6281, 0.7208, 0.6618,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  74.7958096590909 Train Loss:  0.5027281641960144
+Val Acc:  73.5814144736842 Val Loss:  0.5250888466835022
+Saving model ...
+Best Val Acc:  76.76809210526316
+Epoch #:  34
+tensor([0.6483, 0.7288, 0.7164,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  78.56667258522727 Train Loss:  0.4110639691352844
+Val Acc:  77.5904605263158 Val Loss:  0.43022793531417847
+Saving model ...
+Best Val Acc:  77.5904605263158
+Epoch #:  35
+tensor([0.6332, 0.6531, 0.6571,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  77.98073508522727 Train Loss:  0.42715752124786377
+Val Acc:  76.78865131578948 Val Loss:  0.4500226080417633
+Saving model ...
+Best Val Acc:  77.5904605263158
+Epoch #:  36
+tensor([0.7865, 0.6753, 0.6620,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  79.67418323863636 Train Loss:  0.39829733967781067
+Val Acc:  77.4876644736842 Val Loss:  0.4316084682941437
+Saving model ...
+Best Val Acc:  77.5904605263158
+Epoch #:  37
+tensor([0.6045, 0.7007, 0.6552,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  78.7109375 Train Loss:  0.4067958891391754
+Val Acc:  77.0970394736842 Val Loss:  0.43239474296569824
+Saving model ...
+Best Val Acc:  77.5904605263158
+Epoch #:  38
+tensor([0.7087, 0.6459, 0.6590,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  80.02485795454545 Train Loss:  0.3857564926147461
+Val Acc:  77.63157894736842 Val Loss:  0.42575836181640625
+Saving model ...
+Best Val Acc:  77.63157894736842
+Epoch #:  39
+tensor([0.6581, 0.6680, 0.6502,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  79.5565518465909 Train Loss:  0.3967658579349518
+Val Acc:  78.2689144736842 Val Loss:  0.4180249869823456
+Saving model ...
+Best Val Acc:  78.2689144736842
+Epoch #:  40
+tensor([0.6587, 0.6611, 0.6413,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  80.14692826704545 Train Loss:  0.3802432417869568
+Val Acc:  77.8782894736842 Val Loss:  0.4076036810874939
+Saving model ...
+Best Val Acc:  78.2689144736842
+Epoch #:  41
+tensor([0.6430, 0.6585, 0.6614,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  78.8907137784091 Train Loss:  0.4033096134662628
+Val Acc:  76.45970394736842 Val Loss:  0.4645223021507263
+Saving model ...
+Best Val Acc:  78.2689144736842
+Epoch #:  42
+tensor([0.6415, 0.6562, 0.6608,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  80.42658025568181 Train Loss:  0.3769405782222748
+Val Acc:  78.02220394736842 Val Loss:  0.4238046109676361
+Saving model ...
+Best Val Acc:  78.2689144736842
+Epoch #:  43
+tensor([0.6437, 0.6611, 0.6663,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  80.21795099431819 Train Loss:  0.377517431974411
+Val Acc:  78.55674342105263 Val Loss:  0.4123070538043976
+Saving model ...
+Best Val Acc:  78.55674342105263
+Epoch #:  44
+tensor([0.6385, 0.6664, 0.6866,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  80.28675426136364 Train Loss:  0.3870786130428314
+Val Acc:  77.8782894736842 Val Loss:  0.428049772977829
+Saving model ...
+Best Val Acc:  78.55674342105263
+Epoch #:  45
+tensor([0.6167, 0.6680, 0.6510,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  79.4677734375 Train Loss:  0.3943437933921814
+Val Acc:  77.75493421052632 Val Loss:  0.4316643476486206
+Saving model ...
+Best Val Acc:  78.55674342105263
+Epoch #:  46
+tensor([0.6653, 0.6720, 0.6774,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  79.71635298295455 Train Loss:  0.38458847999572754
+Val Acc:  77.07648026315789 Val Loss:  0.43373629450798035
+Saving model ...
+Best Val Acc:  78.55674342105263
+Epoch #:  47
+tensor([0.6576, 0.7258, 0.6426,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  81.43421519886364 Train Loss:  0.3555437922477722
+Val Acc:  78.39226973684211 Val Loss:  0.4273102581501007
+Saving model ...
+Best Val Acc:  78.55674342105263
+Epoch #:  48
+tensor([0.7195, 0.5902, 0.6212,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  81.94691051136364 Train Loss:  0.347111314535141
+Val Acc:  78.47450657894737 Val Loss:  0.4004731774330139
+Saving model ...
+Best Val Acc:  78.55674342105263
+Epoch #:  49
+tensor([0.6499, 0.6270, 0.6633,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  83.0411044034091 Train Loss:  0.3235507011413574
+Val Acc:  80.38651315789474 Val Loss:  0.3701728284358978
+Saving model ...
+Best Val Acc:  80.38651315789474
+Epoch #:  50
+tensor([0.6556, 0.7003, 0.6412,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  82.6327237215909 Train Loss:  0.3314644694328308
+Val Acc:  80.078125 Val Loss:  0.3835252821445465
+Saving model ...
+Best Val Acc:  80.38651315789474
+Epoch #:  51
+tensor([0.6520, 0.6629, 0.6569,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  83.86896306818181 Train Loss:  0.3088836669921875
+Val Acc:  80.57154605263158 Val Loss:  0.38198980689048767
+Saving model ...
+Best Val Acc:  80.57154605263158
+Epoch #:  52
+tensor([0.6582, 0.6625, 0.6649,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  83.63148082386364 Train Loss:  0.3152102828025818
+Val Acc:  79.48190789473684 Val Loss:  0.39236563444137573
+Saving model ...
+Best Val Acc:  80.57154605263158
+Epoch #:  53
+tensor([0.6782, 0.6630, 0.6575,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  83.75799005681819 Train Loss:  0.31132224202156067
+Val Acc:  80.83881578947368 Val Loss:  0.37721237540245056
+Saving model ...
+Best Val Acc:  80.83881578947368
+Epoch #:  54
+tensor([0.6525, 0.6665, 0.6247,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  84.2373934659091 Train Loss:  0.30000370740890503
+Val Acc:  79.97532894736842 Val Loss:  0.39444810152053833
+Saving model ...
+Best Val Acc:  80.83881578947368
+Epoch #:  55
+tensor([0.6579, 0.6224, 0.6872,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  84.65465198863636 Train Loss:  0.2892122268676758
+Val Acc:  80.75657894736842 Val Loss:  0.36038702726364136
+Saving model ...
+Best Val Acc:  80.83881578947368
+Epoch #:  56
+tensor([0.6636, 0.6584, 0.6789,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  85.37153764204545 Train Loss:  0.2837354838848114
+Val Acc:  81.57894736842105 Val Loss:  0.35332679748535156
+Saving model ...
+Best Val Acc:  81.57894736842105
+Epoch #:  57
+tensor([0.6208, 0.6506, 0.6542,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  85.1473721590909 Train Loss:  0.28330761194229126
+Val Acc:  81.640625 Val Loss:  0.3536559045314789
+Saving model ...
+Best Val Acc:  81.640625
+Epoch #:  58
+tensor([0.6578, 0.6570, 0.6719,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  85.66672585227273 Train Loss:  0.275211900472641
+Val Acc:  82.421875 Val Loss:  0.34682536125183105
+Saving model ...
+Best Val Acc:  82.421875
+Epoch #:  59
+tensor([0.6915, 0.6527, 0.6582,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  85.32492897727273 Train Loss:  0.2748120427131653
+Val Acc:  81.0032894736842 Val Loss:  0.3675960600376129
+Saving model ...
+Best Val Acc:  82.421875
+Epoch #:  60
+tensor([0.6363, 0.6624, 0.6456,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  86.1661044034091 Train Loss:  0.2644006907939911
+Val Acc:  81.96957236842105 Val Loss:  0.3548544943332672
+Saving model ...
+Best Val Acc:  82.421875
+Epoch #:  61
+tensor([0.6598, 0.6597, 0.6590,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  86.22602982954545 Train Loss:  0.2621628940105438
+Val Acc:  82.23684210526316 Val Loss:  0.3653757870197296
+Saving model ...
+Best Val Acc:  82.421875
+Epoch #:  62
+tensor([0.6596, 0.6666, 0.6339,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  85.85759943181819 Train Loss:  0.26859188079833984
+Val Acc:  80.38651315789474 Val Loss:  0.37071493268013
+Saving model ...
+Best Val Acc:  82.421875
+Epoch #:  63
+tensor([0.6586, 0.5884, 0.6572,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  86.13725142045455 Train Loss:  0.260130912065506
+Val Acc:  80.859375 Val Loss:  0.34814199805259705
+Saving model ...
+Best Val Acc:  82.421875
+Epoch #:  64
+tensor([0.6704, 0.6440, 0.6495,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  88.0038174715909 Train Loss:  0.2299664169549942
+Val Acc:  83.16200657894737 Val Loss:  0.33075737953186035
+Saving model ...
+Best Val Acc:  83.16200657894737
+Epoch #:  65
+tensor([0.6560, 0.6872, 0.6694,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  85.9130859375 Train Loss:  0.26951831579208374
+Val Acc:  80.48930921052632 Val Loss:  0.3861337900161743
+Saving model ...
+Best Val Acc:  83.16200657894737
+Epoch #:  66
+tensor([0.6635, 0.6574, 0.6582,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  88.08371803977273 Train Loss:  0.2254963517189026
+Val Acc:  82.68914473684211 Val Loss:  0.33312007784843445
+Saving model ...
+Best Val Acc:  83.16200657894737
+Epoch #:  67
+tensor([0.6199, 0.6600, 0.6387,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  87.353515625 Train Loss:  0.23997695744037628
+Val Acc:  81.68174342105263 Val Loss:  0.3613879680633545
+Saving model ...
+Best Val Acc:  83.16200657894737
+Epoch #:  68
+tensor([0.6872, 0.6179, 0.6586,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  89.11354758522727 Train Loss:  0.20634640753269196
+Val Acc:  83.92269736842105 Val Loss:  0.3157961368560791
+Saving model ...
+Best Val Acc:  83.92269736842105
+Epoch #:  69
+tensor([0.6595, 0.6586, 0.6187,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  88.82279829545455 Train Loss:  0.2113269418478012
+Val Acc:  82.421875 Val Loss:  0.3421231210231781
+Saving model ...
+Best Val Acc:  83.92269736842105
+Epoch #:  70
+tensor([0.6748, 0.6371, 0.7037,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  89.0536221590909 Train Loss:  0.20651653409004211
+Val Acc:  82.52467105263158 Val Loss:  0.3328998386859894
+Saving model ...
+Best Val Acc:  83.92269736842105
+Epoch #:  71
+tensor([0.6945, 0.6626, 0.6580,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  90.08123224431819 Train Loss:  0.1883174628019333
+Val Acc:  83.28536184210526 Val Loss:  0.327897846698761
+Saving model ...
+Best Val Acc:  83.92269736842105
+Epoch #:  72
+tensor([0.6513, 0.6591, 0.6614,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  89.62180397727273 Train Loss:  0.19662164151668549
+Val Acc:  82.73026315789474 Val Loss:  0.34893152117729187
+Saving model ...
+Best Val Acc:  83.92269736842105
+Epoch #:  73
+tensor([0.6346, 0.6565, 0.6602,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  90.53844105113636 Train Loss:  0.183043971657753
+Val Acc:  83.53207236842105 Val Loss:  0.33587783575057983
+Saving model ...
+Best Val Acc:  83.92269736842105
+Epoch #:  74
+tensor([0.6817, 0.6591, 0.6815,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  91.6415127840909 Train Loss:  0.16047607362270355
+Val Acc:  84.25164473684211 Val Loss:  0.3244495391845703
+Saving model ...
+Best Val Acc:  84.25164473684211
+Epoch #:  75
+tensor([0.6591, 0.6682, 0.6622,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  90.50958806818181 Train Loss:  0.17985305190086365
+Val Acc:  83.10032894736842 Val Loss:  0.3529480993747711
+Saving model ...
+Best Val Acc:  84.25164473684211
+Epoch #:  76
+tensor([0.6550, 0.6566, 0.6491,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  91.51056463068181 Train Loss:  0.1623115837574005
+Val Acc:  83.75822368421052 Val Loss:  0.32261526584625244
+Saving model ...
+Best Val Acc:  84.25164473684211
+Epoch #:  77
+tensor([0.6479, 0.6694, 0.6593,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  92.37615411931819 Train Loss:  0.1459486186504364
+Val Acc:  84.18996710526316 Val Loss:  0.3201821446418762
+Saving model ...
+Best Val Acc:  84.25164473684211
+Epoch #:  78
+tensor([0.6589, 0.6408, 0.6509,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  92.2696200284091 Train Loss:  0.1462492048740387
+Val Acc:  83.71710526315789 Val Loss:  0.3354078233242035
+Saving model ...
+Best Val Acc:  84.25164473684211
+Epoch #:  79
+tensor([0.6596, 0.6524, 0.7076,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  93.01979758522727 Train Loss:  0.13487796485424042
+Val Acc:  84.25164473684211 Val Loss:  0.32114022970199585
+Saving model ...
+Best Val Acc:  84.25164473684211
+Epoch #:  80
+tensor([0.6640, 0.6604, 0.6599,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  93.47034801136364 Train Loss:  0.12698110938072205
+Val Acc:  84.25164473684211 Val Loss:  0.31612399220466614
+Saving model ...
+Best Val Acc:  84.25164473684211
+Epoch #:  81
+tensor([0.5970, 0.6642, 0.6788,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  94.2227450284091 Train Loss:  0.11060401797294617
+Val Acc:  84.95065789473684 Val Loss:  0.3055626153945923
+Saving model ...
+Best Val Acc:  84.95065789473684
+Epoch #:  82
+tensor([0.6934, 0.6609, 0.6697,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  94.3204012784091 Train Loss:  0.1111827865242958
+Val Acc:  85.21792763157895 Val Loss:  0.30655595660209656
+Saving model ...
+Best Val Acc:  85.21792763157895
+Epoch #:  83
+tensor([0.5954, 0.6789, 0.6582,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  94.83531605113636 Train Loss:  0.1012583002448082
+Val Acc:  85.21792763157895 Val Loss:  0.30255433917045593
+Saving model ...
+Best Val Acc:  85.21792763157895
+Epoch #:  84
+tensor([0.6586, 0.6389, 0.6374,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  95.08611505681819 Train Loss:  0.09688971936702728
+Val Acc:  85.71134868421052 Val Loss:  0.3020823001861572
+Saving model ...
+Best Val Acc:  85.71134868421052
+Epoch #:  85
+tensor([0.6612, 0.6590, 0.6638,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  94.95960582386364 Train Loss:  0.09705474972724915
+Val Acc:  85.546875 Val Loss:  0.31024467945098877
+Saving model ...
+Best Val Acc:  85.71134868421052
+Epoch #:  86
+tensor([0.6590, 0.7701, 0.6575,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  95.14382102272727 Train Loss:  0.09443814307451248
+Val Acc:  85.50575657894737 Val Loss:  0.3168463110923767
+Saving model ...
+Best Val Acc:  85.71134868421052
+Epoch #:  87
+tensor([0.6590, 0.6370, 0.6603,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  95.8829012784091 Train Loss:  0.08064471185207367
+Val Acc:  85.97861842105263 Val Loss:  0.30443885922431946
+Saving model ...
+Best Val Acc:  85.97861842105263
+Epoch #:  88
+tensor([0.6579, 0.6702, 0.6621,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  96.16921164772727 Train Loss:  0.07571832090616226
+Val Acc:  86.04029605263158 Val Loss:  0.3028760850429535
+Saving model ...
+Best Val Acc:  86.04029605263158
+Epoch #:  89
+tensor([0.6590, 0.6670, 0.6674,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  96.31791548295455 Train Loss:  0.07151759415864944
+Val Acc:  86.4720394736842 Val Loss:  0.3093394339084625
+Saving model ...
+Best Val Acc:  86.4720394736842
+Epoch #:  90
+tensor([0.6597, 0.6596, 0.6635,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  96.59978693181819 Train Loss:  0.06760784983634949
+Val Acc:  85.6907894736842 Val Loss:  0.3081023395061493
+Saving model ...
+Best Val Acc:  86.4720394736842
+Epoch #:  91
+tensor([0.6590, 0.6590, 0.6522,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  96.923828125 Train Loss:  0.061503827571868896
+Val Acc:  85.7935855263158 Val Loss:  0.30745306611061096
+Saving model ...
+Best Val Acc:  86.4720394736842
+Epoch #:  92
+tensor([0.8923, 0.6643, 0.6591,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  97.15465198863636 Train Loss:  0.05880201607942581
+Val Acc:  86.69819078947368 Val Loss:  0.3078837990760803
+Saving model ...
+Best Val Acc:  86.69819078947368
+Epoch #:  93
+tensor([0.6590, 0.6635, 0.6153,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  97.2256747159091 Train Loss:  0.05613572895526886
+Val Acc:  86.63651315789474 Val Loss:  0.31407615542411804
+Saving model ...
+Best Val Acc:  86.69819078947368
+Epoch #:  94
+tensor([0.6589, 0.6375, 0.6590,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  97.28560014204545 Train Loss:  0.05609418824315071
+Val Acc:  86.63651315789474 Val Loss:  0.3166799545288086
+Saving model ...
+Best Val Acc:  86.69819078947368
+Epoch #:  95
+tensor([0.6683, 0.6608, 0.6478,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  97.44984019886364 Train Loss:  0.05331886559724808
+Val Acc:  86.34868421052632 Val Loss:  0.32317158579826355
+Saving model ...
+Best Val Acc:  86.69819078947368
+Epoch #:  96
+tensor([0.6606, 0.6590, 0.6596,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  97.5741299715909 Train Loss:  0.051350876688957214
+Val Acc:  86.51315789473684 Val Loss:  0.314546674489975
+Saving model ...
+Best Val Acc:  86.69819078947368
+Epoch #:  97
+tensor([0.6601, 0.6560, 0.6652,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  97.5741299715909 Train Loss:  0.050854023545980453
+Val Acc:  86.61595394736842 Val Loss:  0.3205162286758423
+Saving model ...
+Best Val Acc:  86.69819078947368
+Epoch #:  98
+tensor([0.6694, 0.6588, 0.6584,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  97.64515269886364 Train Loss:  0.04880066588521004
+Val Acc:  86.8626644736842 Val Loss:  0.32006290555000305
+Saving model ...
+Best Val Acc:  86.8626644736842
+Epoch #:  99
+tensor([0.6451, 0.6592, 0.6520,  ..., 0.7311, 0.7311, 0.7311])
+Train Acc:  97.7294921875 Train Loss:  0.048191580921411514
+Val Acc:  86.4720394736842 Val Loss:  0.32222980260849
+Saving model ...
+Best Val Acc:  86.8626644736842

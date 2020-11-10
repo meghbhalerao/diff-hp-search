@@ -2,6 +2,7 @@ from os import access
 import torch
 import torchvision.transforms as transforms
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim as optim
 import os
 import argparse
@@ -44,22 +45,24 @@ def main():
     learning_rate_min =  0.001
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, float(num_epochs), eta_min=learning_rate_min)
     weight_bank = weight_sample
-    best_acc = 0
-    best_ep = 0
+    best_val_acc = 0
+    best_val_ep = 0
     for epoch in range(num_epochs):
         print("Epoch #: ", epoch)
         train_loss, train_acc = train(model, train_loader, val_loader, criterion, weight_bank, optimizer)
+        train_loss = train_loss.cpu().data.item()
         print("Train Acc: ", train_acc, "Train Loss: ", train_loss)
         val_loss, val_acc = val(model, val_loader, criterion)
-        print("Val Loss: ", val_loss,"Val Acc: ", val_acc)
+        val_loss = val_loss.cpu().data.item()
+        print("Val Acc: ", val_acc,"Val Loss: ", val_loss)
         # Initialize the train_loader here again
         print("Saving model ...")
-        if val_acc > best_acc:
-            best_acc = val_acc
-            best_ep = epoch
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            best_val_ep = epoch
             torch.save({'epoch': epoch, 'val_acc': val_acc, 'val_loss': val_loss, 'model': model.state_dict()}, "./model_weights/model_best.ckpt.best.pth.tar")
-            torch.save(weight_bank,"weight_bank.pth")
-
+            torch.save(weight_bank,"./model_weights/weight_bank.pth")
+        print("Best Val Acc: ", best_val_acc)
         scheduler.step()
 
 def train(model, train_loader, val_loader, criterion, weight_bank, optimizer):
@@ -89,6 +92,7 @@ def train(model, train_loader, val_loader, criterion, weight_bank, optimizer):
         optimizer.step()
         optimizer.zero_grad()
 
+    weight_bank = F.sigmoid(weight_bank) # Squeezing the weight values between 0 and 1 to make it like a probablity 
     print(weight_bank)
     train_loader.dataset.weight_sample = weight_bank
     train_loss, train_acc = get_acc(model, criterion, train_loader)
