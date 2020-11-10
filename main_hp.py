@@ -93,7 +93,6 @@ def train(model, train_loader, val_loader, criterion, weight_bank, optimizer):
         optimizer.step()
         optimizer.zero_grad()
         unrolled_model.zero_grad()
-        break
 
     weight_bank =  torch.sigmoid(weight_bank * 2) # Squeezing the weight values between 0 and 1 to make it like a probablity 
     print(weight_bank)

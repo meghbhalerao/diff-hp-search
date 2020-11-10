@@ -472,3 +472,9 @@ Val Acc:  83.47039473684211 Val Loss:  0.514748752117157
 Saving model ...
 Best Val Acc:  84.53947368421052
 Epoch #:  78
+tensor([1.0310, 0.6440, 0.9305,  ..., 1.0000, 1.0000, 1.0000])
+Train Acc:  92.59144176136364 Train Loss:  0.21180033683776855
+Val Acc:  84.04605263157895 Val Loss:  0.5130937099456787
+Saving model ...
+Best Val Acc:  84.53947368421052
+Epoch #:  79
