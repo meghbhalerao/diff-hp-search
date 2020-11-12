@@ -41,6 +41,7 @@ def main():
     f = open("./data/cifar/lists/train.txt","r")
     f_list = [line for line in f]
     weight_sample = torch.ones(len(f_list))
+    ssl_data = Imagelists(image_list = os.path.join("./data/cifar/lists/ssl.txt"),weight_sample = weight_sample, root="./data/cifar/train/", transform=transform_train)
     train_data = Imagelists(image_list = os.path.join("./data/cifar/lists/train.txt"),weight_sample = weight_sample, root="./data/cifar/train/", transform=transform_train)
     val_data = Imagelists(image_list = os.path.join("./data/cifar/lists/val.txt"), weight_sample = weight_sample, root="./data/cifar/train/", transform=transform_val)
 
