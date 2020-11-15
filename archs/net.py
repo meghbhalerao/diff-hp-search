@@ -42,7 +42,8 @@ class AlexNet(nn.Module):
         else:
             logits = self(input)
         logits = self(input)
-        return self._criterion(logits, target, mask)    
+        return self._criterion(logits, target, mask) 
+
     
 class Predictor(nn.Module):
     def __init__(self, num_class=10, inc=4096, temp=0.05):

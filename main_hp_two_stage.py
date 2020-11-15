@@ -135,21 +135,21 @@ def main():
         # Update weights W and A_1 with repect to L_ssl and L_val respectively
         img_ssl_q, img_ssl_k, A_ssl = item_ssl[0].cuda(), item_ssl[1].cuda(), item_ssl[3].cuda()
         A_ssl.requires_grad = True
-        ssl_step(W,W_k, optimizer_W, img_ssl_q, img_ssl_k, queue, queue_ptr, K)
+        loss_ssl = ssl_step(W,W_k, optimizer_W, img_ssl_q, img_ssl_k, queue, queue_ptr, K)
+        loss_ssl.backward()
+        optimizer_W.step()
         unrolled_W = deepcopy(W)
         unrolled_loss = unrolled_W._loss(input_search, target_search, A_ssl, H)
         change_model(H,freeze=True)
         unrolled_loss.backward()
         change_model(H,freeze=False)
         unrolled_W_grad_vector = [v.grad.data for v in unrolled_W.parameters()]
-        gradients = hessian_vector_product_2(W, unrolled_W_grad_vector, img_ssl_q, targets_ssl, A_ssl)
+        gradients = hessian_vector_product_ssl(W, W_k, img_ssl_q, img_ssl_k, unrolled_W_grad_vector, A_ssl)
         A_ssl = A_ssl - gradients[0]
         A_ssl = A_ssl.detach()
         A_ssl.requires_grad = False
         A_ssl_bank[idx_ssl * bs: (idx_ssl + 1) * bs] = A_ssl
         idx_ssl = idx_ssl + 1
-        optimizer_W.step()
-        optimizer_W.zero_grad()
         unrolled_W.zero_grad()
         print("Iteration done")
 
