@@ -38,85 +38,119 @@ def main():
     ])
 
 
-    f = open("./data/cifar/lists/train.txt","r")
-    f_list = [line for line in f]
-    weight_sample = torch.ones(len(f_list))
-    ssl_data = Imagelists(image_list = os.path.join("./data/cifar/lists/ssl.txt"),weight_sample = weight_sample, root="./data/cifar/train/", transform=transform_train)
-    train_data = Imagelists(image_list = os.path.join("./data/cifar/lists/train.txt"),weight_sample = weight_sample, root="./data/cifar/train/", transform=transform_train)
-    val_data = Imagelists(image_list = os.path.join("./data/cifar/lists/val.txt"), weight_sample = weight_sample, root="./data/cifar/train/", transform=transform_val)
+    f_train = open("./data/cifar/lists/train.txt","r")
+    f_list = [line for line in f_train]
+    A_train_bank = torch.ones(len(f_list))
 
-    train_loader = torch.utils.data.DataLoader(train_data, batch_size=128, shuffle=True, num_workers=2, drop_last = True)
+    f_ssl = open("./data/cifar/lists/ssl.txt","r")
+    f_list = [line for line in f_ssl]
+    A_ssl_bank = torch.ones(len(f_list))
 
-    val_loader = torch.utils.data.DataLoader(val_data, batch_size=128, shuffle=False, num_workers=2, drop_last = True)
+    ssl_data = Imagelists(image_list = os.path.join("./data/cifar/lists/ssl.txt"),weight_sample = A_ssl_bank, root="./data/cifar/train/", transform=transform_train)
+    train_data = Imagelists(image_list = os.path.join("./data/cifar/lists/train.txt"),weight_sample = A_train_bank, root="./data/cifar/train/", transform=transform_train)
+    val_data = Imagelists(image_list = os.path.join("./data/cifar/lists/val.txt"), weight_sample = [A_train_bank,A_ssl_bank], root="./data/cifar/train/", transform=transform_val)
+
+    bs = 100
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size=bs, shuffle=True, num_workers=2, drop_last = True)
+    val_loader = torch.utils.data.DataLoader(val_data, batch_size=bs, shuffle=False, num_workers=2, drop_last = True)
+    ssl_loader = torch.utils.data.DataLoader(ssl_data, batch_size=bs, shuffle=False, num_workers=2, drop_last = True)
 
     criterion = CE_Mask().cuda()
-    model = AlexNet(criterion = CE_Mask, num_classes = 10).cuda()
-    optimizer = optim.SGD(model.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-    num_epochs = 100
+    criterion_ssl = CE_Mask().cuda()
+    H = AlexNet(criterion = CE_Mask, num_classes = 10).cuda()
+    W = Predictor(num_class=10).cuda()
+
+    optimizer_H = optim.SGD(H.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+    optimizer_W = optim.SGD(W.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+    num_iter = 50000
     learning_rate_min =  0.001
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, float(num_epochs), eta_min=learning_rate_min)
-    weight_bank = weight_sample
+    #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, float(num_iter), eta_min=learning_rate_min)
     best_val_acc = 0
     best_val_ep = 0
-    for epoch in range(num_epochs):
-        print("Epoch #: ", epoch)
-        train_loss, train_acc = train(model, train_loader, val_loader, criterion, weight_bank, optimizer)
-        train_loss = train_loss.cpu().data.item()
-        print("Train Acc: ", train_acc, "Train Loss: ", train_loss)
-        val_loss, val_acc = val(model, val_loader, criterion)
-        val_loss = val_loss.cpu().data.item()
-        print("Val Acc: ", val_acc,"Val Loss: ", val_loss)
-        # Initialize the train_loader here again
-        print("Saving model ...")
-        if val_acc > best_val_acc:
-            best_val_acc = val_acc
-            best_val_ep = epoch
-            torch.save({'epoch': epoch, 'val_acc': val_acc, 'val_loss': val_loss, 'model': model.state_dict()}, "./model_weights/model_best.ckpt.best.pth.tar")
-            torch.save(weight_bank,"./model_weights/weight_bank.pth")
-        print("Best Val Acc: ", best_val_acc)
+    len_train = len(train_loader)
+    len_ssl = len(ssl_loader)
+    len_val = len(val_loader)
+    def change_model(model, freeze = True):
+        for params in model.parameters():
+            params.requires_grad = not freeze
+
+    for it in range(num_iter):
+        if it % len_train == 0:
+            train_iter = iter(train_loader)
+            idx_train = 0
+            A_train_bank =  torch.sigmoid(A_train_bank * 2)
+            print(A_train_bank)
+            train_loader.dataset.weight_sample = A_train_bank
+            train_loss, train_acc = get_acc(H,W, criterion, train_loader)
+
+        if it % len_ssl == 0:
+            ssl_iter = iter(ssl_loader)
+            idx_ssl = 0
+            A_ssl_bank =  torch.sigmoid(A_ssl_bank * 2)
+            print(A_ssl_bank)
+            ssl_loader.dataset.weight_sample = A_train_bank
+
+        if it % len_val == 0:
+            val_iter = iter(val_loader)
+
+        item_train = next(train_iter)
+        item_ssl = next(ssl_iter)
+        item_val = next(val_iter)
+
+        #Update weights H and A_2 with repect to L_train and L_val respectively
+        img_train, targets_train, A_train = item_train[0].cuda(), item_train[1].cuda(), item_train[2].cuda()
+        A_train.requires_grad = True
+        input_search, target_search = item_val[0].cuda(), item_val[1].cuda()
+        logits = H(W(img_train))
+        loss_A_train = criterion(logits,targets_train.cuda(),A_train.cuda())
+        change_model(W,freeze=True)
+        loss_A_train.backward() # Updating model 1 time
+        change_model(W,freeze=False)
+        unrolled_H = deepcopy(H)
+        unrolled_loss = unrolled_H._loss(W(input_search), target_search, A_train)
+        unrolled_loss.backward()
+        unrolled_H_grad_vector = [v.grad.data for v in unrolled_H.parameters()]
+        gradients = hessian_vector_product(H, unrolled_H_grad_vector, W(img_train), targets_train, A_train)
+        A_train = A_train - gradients[0]
+        A_train = A_train.detach()
+        A_train.requires_grad = False
+        A_train_bank[idx_train * bs: (idx_train + 1) * bs] = A_train
+        idx_train = idx_train + 1
+        optimizer_H.step()
+        optimizer_H.zero_grad()
+        unrolled_H.zero_grad()
+
+        # Update weights W and A_1 with repect to L_ssl and L_val respectively
+        img_ssl, targets_ssl, A_ssl = item_ssl[0].cuda(), item_ssl[1].cuda(), item_ssl[2].cuda()
+        A_ssl.requires_grad = True
+        input_search, target_search = item_val[0].cuda(), item_val[1].cuda()
+        logits = W(img_ssl)
+        loss_A_ssl = criterion(logits, targets_ssl.cuda(), A_ssl.cuda())
+        loss_A_ssl.backward() # Updating model 1 time
+        unrolled_W = deepcopy(W)
+        unrolled_loss = unrolled_W._loss(input_search, target_search, A_ssl)
+        unrolled_loss.backward()
+        unrolled_W_grad_vector = [v.grad.data for v in unrolled_W.parameters()]
+        gradients = hessian_vector_product(W, unrolled_W_grad_vector, img_ssl, targets_ssl, A_ssl)
+        A_ssl = A_ssl - gradients[0]
+        A_ssl = A_ssl.detach()
+        A_ssl.requires_grad = False
+        A_ssl_bank[idx_ssl * bs: (idx_ssl + 1) * bs] = A_ssl
+        idx_ssl = idx_ssl + 1
+        optimizer_W.step()
+        optimizer_W.zero_grad()
+        unrolled_W.zero_grad()
         scheduler.step()
 
-def train(model, train_loader, val_loader, criterion, weight_bank, optimizer):
-    model.train()
-    batch_size = train_loader.batch_size
-    for idx, (img, targets, weight, _) in enumerate(train_loader):
-        img, targets, weight = img.cuda(), targets.cuda(), weight.cuda()
-        weight.requires_grad = True
-        input_search, target_search, _ , _ = next(iter(val_loader)) # Querying the validation image and targets to update A
-        input_search, target_search = input_search.cuda(), target_search.cuda()
-        logits = model(img)
-        loss_weights = criterion(logits,targets.cuda(),weight.cuda())
-        loss_weights.backward() # Updating model 1 time
-        
-        # Making a separate network for a one step unrolled model
-        unrolled_model = deepcopy(model)
-        unrolled_loss = unrolled_model._loss(input_search, target_search, weight)
-        unrolled_loss.backward()
-
-        # Update A i.e. weights for the loss functions
-        unrolled_model_grad_vector = [v.grad.data for v in unrolled_model.parameters()]
-        gradients = hessian_vector_product(model, unrolled_model_grad_vector, img, targets, weight)
-        weight = weight - gradients[0]
-        weight = weight.detach()
-        weight.requires_grad = False
-        weight_bank[idx * batch_size: (idx + 1) * batch_size] = weight
-        optimizer.step()
-        optimizer.zero_grad()
-        unrolled_model.zero_grad()
-
-    weight_bank =  torch.sigmoid(weight_bank * 2) # Squeezing the weight values between 0 and 1 to make it like a probablity 
-    print(weight_bank)
-    train_loader.dataset.weight_sample = weight_bank
-    train_loss, train_acc = get_acc(model, criterion, train_loader)
-    return train_loss, train_acc
 
 def val(model, val_loader, criterion):
     model.eval()
     val_loss, val_acc = get_acc(model, criterion, val_loader)
     return val_loss, val_acc
 
-def get_acc(model, criterion, loader):
-    model.eval()
+def get_acc(H, W, criterion, loader):
+    H.eval()
+    W.eval()
     test_loss = 0
     correct = 0
     size = 0
@@ -128,7 +162,7 @@ def get_acc(model, criterion, loader):
             im_data = data[0].cuda()
             gt_labels  = data[1].cuda()
             weight = data[2].cuda()
-            output1 = model(im_data)
+            output1 = H(W(im_data))
             output_all = np.r_[output_all, output1.data.cpu().numpy()]
             size += im_data.size(0)
             pred1 = output1.data.max(1)[1]
@@ -143,3 +177,14 @@ def get_acc(model, criterion, loader):
 
 if __name__ == "__main__":
     main()
+
+
+
+
+"""
+print("Saving model ...")
+if val_acc > best_val_acc:
+    best_val_acc = val_acc
+    best_val_ep = epoch
+    torch.save({'epoch': epoch, 'val_acc': val_acc, 'val_loss': val_loss, 'H': H.state_dict(), 'W': W.state_dict(), 'A_ssl': A_ssl, 'A_train': A_train}, "./model_weights/checkpoint.best.pth.tar")
+"""

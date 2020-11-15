@@ -60,8 +60,6 @@ class Predictor(nn.Module):
         self.temp = temp
 
     def forward(self, x, reverse=False, eta=0.1):
-        if reverse:
-            x = grad_reverse(x, eta)
         x = F.normalize(x)
         x_out = self.fc(x) / self.temp
         return x_out
@@ -77,8 +75,6 @@ class Predictor_deep(nn.Module):
 
     def forward(self, x, reverse=False, eta=0.1):
         x = self.fc1(x)
-        if reverse:
-            x = grad_reverse(x, eta)
         x = F.normalize(x)
         x_out = self.fc2(x) / self.temp
         return x_out
