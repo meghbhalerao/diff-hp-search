@@ -47,10 +47,10 @@ class Imagelists(object):
         if not self.ssl:
             if self.transform is not None:
                 img = self.transform(img)
-            if self.weight_sample is not None:
-                return img, target, weight_sample_idx, self.imgs[index]
-            else:
+            if self.weight_sample == None:
                 return img, target, self.imgs[index]
+            else:
+                return img, target, self.weight_sample[index], self.imgs[index]
         if self.ssl:
             if self.transform is not None:
                 img_q = self.transform(img)

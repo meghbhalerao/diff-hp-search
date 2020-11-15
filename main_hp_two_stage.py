@@ -68,8 +68,8 @@ def main():
     W_k.load_state_dict(W.state_dict())
     H = Predictor_deep(criterion = CE_Mask, num_class=10).cuda()
 
-    optimizer_H = optim.SGD(H.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
-    optimizer_W = optim.SGD(W.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+    optimizer_H = optim.SGD(H.parameters(), lr=0.01, momentum=0.9, weight_decay=5e-4)
+    optimizer_W = optim.SGD(W.parameters(), lr=0.01, momentum=0.9, weight_decay=5e-4)
 
     num_iter = 50000
     learning_rate_min =  0.001
@@ -106,10 +106,9 @@ def main():
             val_iter = iter(val_loader)
             val_loss, val_acc = val(H,W, val_loader, criterion)
             print("Saving model ...")
-        if val_acc > best_val_acc:
-            best_val_acc = val_acc
-            best_val_ep = epoch
-            torch.save({'epoch': epoch, 'val_acc': val_acc, 'val_loss': val_loss, 'H': H.state_dict(), 'W': W.state_dict(), 'A_ssl': A_ssl, 'A_train': A_train}, "./model_weights/checkpoint.best.pth.tar")
+            if val_acc > best_val_acc:
+                best_val_acc = val_acc
+                torch.save({'epoch': it, 'val_acc': val_acc, 'val_loss': val_loss, 'H': H.state_dict(), 'W': W.state_dict(), 'A_ssl': A_ssl_bank, 'A_train': A_train_bank}, "./model_weights/checkpoint.best.pth.tar")
 
 
         item_train = next(train_iter)
@@ -129,6 +128,7 @@ def main():
         unrolled_loss.backward() # Gradients to update A_train
         change_model(W,freeze=False)
         unrolled_H_grad_vector = [v.grad.data for v in unrolled_H.parameters()]
+        print(unrolled_H_grad_vector)
         gradients = hessian_vector_product(H, unrolled_H_grad_vector, W(img_train), targets_train, A_train)
         A_train = A_train - gradients[0] # Updating A_train
         A_train = A_train.detach()
@@ -151,24 +151,25 @@ def main():
         unrolled_loss.backward()
         change_model(H,freeze=False)
         unrolled_W_grad_vector = [v.grad.data for v in unrolled_W.parameters()]
+        #print(unrolled_W_grad_vector)
         gradients = hessian_vector_product_ssl(W, W_k, img_ssl_q, img_ssl_k, unrolled_W_grad_vector, A_ssl, queue)
         A_ssl = A_ssl - gradients[0]
         A_ssl = A_ssl.detach()
+        A_ssl = torch.sigmoid(A_ssl)
         A_ssl.requires_grad = False
         A_ssl_bank[idx_ssl * bs: (idx_ssl + 1) * bs] = A_ssl
         idx_ssl = idx_ssl + 1
         unrolled_W.zero_grad()
         optimizer_W.zero_grad()
-        print(gradients.shape)
 
 
 def val(H,W, val_loader, criterion):
     H.eval()
     W.eval()
-    val_loss, val_acc = get_acc(H,W, criterion, val_loader)
+    val_loss, val_acc = get_acc(H,W, criterion, val_loader, valid=True)
     return val_loss, val_acc
 
-def get_acc(H, W, criterion, loader):
+def get_acc(H, W, criterion, loader, valid = False):
     H.eval()
     W.eval()
     test_loss = 0
@@ -179,12 +180,10 @@ def get_acc(H, W, criterion, loader):
     confusion_matrix = torch.zeros(num_class, num_class)
     with torch.no_grad():
         for batch_idx, data in enumerate(loader):
-            print(data)
             im_data = data[0].cuda()
             gt_labels  = data[1].cuda()
-            weight = data[2]
-            if weight is not None:
-                weight = weight.cuda()
+            if not val:
+                weight = data[2].cuda()
             output1 = H(W(im_data))
             output_all = np.r_[output_all, output1.data.cpu().numpy()]
             size += im_data.size(0)
@@ -192,7 +191,10 @@ def get_acc(H, W, criterion, loader):
             for t, p in zip(gt_labels.view(-1), pred1.view(-1)):
                 confusion_matrix[t.long(), p.long()] += 1
             correct += pred1.eq(gt_labels.data).cpu().sum()
-            test_loss += criterion(output1, gt_labels, weight) / len(loader)
+            if not val:
+                test_loss += criterion(output1, gt_labels, weight) / len(loader)
+            else:
+                test_loss += criterion(output1, gt_labels, None) / len(loader)
     return test_loss.data, 100. * float(correct) / size
 
 

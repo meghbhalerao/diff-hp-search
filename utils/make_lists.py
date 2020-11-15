@@ -23,8 +23,8 @@ for img in os.listdir(train_path):
     #f_test.write(img + " " + str(label_dict[res]) + "\n")
     rand_num = random.random()
     if rand_num > 0.1 and rand_num<0.9:
-        f_train.write(img + " " + str(label_dict[res]) + "\n")
+        f_ssl.write(img + " " + str(label_dict[res]) + "\n")
     elif rand_num >= 0.9:
         f_val.write(img + " " + str(label_dict[res]) + "\n")
     elif rand_num <= 0.1:
-        f_ssl.write(img + " " + str(label_dict[res]) + "\n")
+        f_train.write(img + " " + str(label_dict[res]) + "\n")
