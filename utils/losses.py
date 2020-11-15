@@ -8,5 +8,8 @@ class CE_Mask(nn.Module):
         self.criterion_ce = nn.CrossEntropyLoss(reduction = self.reduction)
 
     def forward(self, input, target, weight):
-        ce_loss = torch.mean(weight * self.criterion_ce(input,target))
-        return ce_loss
+        if weight is not None:
+            ce_loss = torch.mean(weight * self.criterion_ce(input,target))
+            return ce_loss
+        else:
+            return torch.mean(self.criterion_ce(input,target))

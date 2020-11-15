@@ -159,6 +159,7 @@ def main():
         idx_ssl = idx_ssl + 1
         unrolled_W.zero_grad()
         optimizer_W.zero_grad()
+        print(gradients.shape)
 
 
 def val(H,W, val_loader, criterion):
@@ -178,9 +179,12 @@ def get_acc(H, W, criterion, loader):
     confusion_matrix = torch.zeros(num_class, num_class)
     with torch.no_grad():
         for batch_idx, data in enumerate(loader):
+            print(data)
             im_data = data[0].cuda()
             gt_labels  = data[1].cuda()
-            weight = data[2].cuda()
+            weight = data[2]
+            if weight is not None:
+                weight = weight.cuda()
             output1 = H(W(im_data))
             output_all = np.r_[output_all, output1.data.cpu().numpy()]
             size += im_data.size(0)
@@ -189,7 +193,6 @@ def get_acc(H, W, criterion, loader):
                 confusion_matrix[t.long(), p.long()] += 1
             correct += pred1.eq(gt_labels.data).cpu().sum()
             test_loss += criterion(output1, gt_labels, weight) / len(loader)
-    #print('\nTest set: Average loss: {:.4f}, ''Accuracy: {}/{} F1 ({:.0f}%)\n'.format(test_loss, correct, size, 100. * correct / size))
     return test_loss.data, 100. * float(correct) / size
 
 
