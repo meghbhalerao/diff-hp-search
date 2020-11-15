@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-def ssl_step(W, W_k, img_ssl_q, img_ssl_k, queue = None, queue_ptr = None, K = None, A_ssl = None):
+def ssl_step(W, W_k, img_ssl_q, img_ssl_k, queue = None, queue_ptr = None, K = None, A_ssl = None, criterion = None):
     q = W(img_ssl_q) #query
     k = W_k(img_ssl_k) #k
     k = k.detach()
@@ -11,8 +11,8 @@ def ssl_step(W, W_k, img_ssl_q, img_ssl_k, queue = None, queue_ptr = None, K = N
     logits /= 0.07
     labels = torch.zeros(logits.shape[0], dtype=torch.long).cuda()
     # Here mask needs to be added
-    loss_ssl = nn.CrossEntropyLoss(logits, labels)
-    if queue is not None:
+    loss_ssl = criterion(logits, labels, A_ssl)
+    if queue_ptr is not None:
         momentum_update_key_encoder(W,W_k, 0.99)
         dequeue_and_enqueue(k, queue, queue_ptr, K)
     return loss_ssl

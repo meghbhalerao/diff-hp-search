@@ -41,8 +41,8 @@ def main():
     # Defining the queue and queue pointer
     K = 3000
     queue = torch.randn(4096, K) # feature dimension and number of examples in the queue 
-    queue = nn.functional.normalize(queue, dim=0)
-    queue_ptr = torch.zeros(1, dtype=torch.long)
+    queue = nn.functional.normalize(queue, dim=0).cuda()
+    queue_ptr = torch.zeros(1, dtype=torch.long).cuda()
     
     f_train = open("./data/cifar/lists/train.txt","r")
     f_list = [line for line in f_train]
@@ -135,7 +135,7 @@ def main():
         # Update weights W and A_1 with repect to L_ssl and L_val respectively
         img_ssl_q, img_ssl_k, A_ssl = item_ssl[0].cuda(), item_ssl[1].cuda(), item_ssl[3].cuda()
         A_ssl.requires_grad = True
-        loss_ssl = ssl_step(W,W_k, optimizer_W, img_ssl_q, img_ssl_k, queue, queue_ptr, K)
+        loss_ssl = ssl_step(W,W_k, img_ssl_q, img_ssl_k, queue, queue_ptr, K, A_ssl, criterion_ssl)
         loss_ssl.backward()
         optimizer_W.step()
         unrolled_W = deepcopy(W)
@@ -144,14 +144,14 @@ def main():
         unrolled_loss.backward()
         change_model(H,freeze=False)
         unrolled_W_grad_vector = [v.grad.data for v in unrolled_W.parameters()]
-        gradients = hessian_vector_product_ssl(W, W_k, img_ssl_q, img_ssl_k, unrolled_W_grad_vector, A_ssl)
+        gradients = hessian_vector_product_ssl(W, W_k, img_ssl_q, img_ssl_k, unrolled_W_grad_vector, A_ssl, queue)
         A_ssl = A_ssl - gradients[0]
         A_ssl = A_ssl.detach()
         A_ssl.requires_grad = False
         A_ssl_bank[idx_ssl * bs: (idx_ssl + 1) * bs] = A_ssl
         idx_ssl = idx_ssl + 1
         unrolled_W.zero_grad()
-        print("Iteration done")
+        optimizer_W.zero_grad()
 
 
 def val(H,W, val_loader, criterion):
