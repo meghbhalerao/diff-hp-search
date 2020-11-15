@@ -40,3 +40,4 @@ def hessian_vector_product_2(model, vector, input, target, weights,  r=1e-2):
       p.data.add_(R, v)
 
     return [(x-y).div_(2*R) for x, y in zip(grads_p, grads_n)]
+

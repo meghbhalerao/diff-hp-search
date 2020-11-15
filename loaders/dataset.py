@@ -27,7 +27,7 @@ def make_dataset_fromlist(image_list):
 
 
 class Imagelists(object):
-    def __init__(self, image_list, weight_sample, root="./data/cifar/train/", transform=None):
+    def __init__(self, image_list, weight_sample, ssl = False, root="./data/cifar/train/", transform=None):
         imgs, labels = make_dataset_fromlist(image_list)
         self.imgs = imgs
         self.labels = labels
@@ -35,6 +35,7 @@ class Imagelists(object):
         self.loader = pil_loader
         self.root = root
         self.weight_sample = weight_sample
+        self.ssl = ssl
 
     def __getitem__(self, index):
         path = os.path.join(self.root, self.imgs[index])
@@ -43,11 +44,21 @@ class Imagelists(object):
         #weight_sample = self.update_weight_sample(new_weight_sample)
         if self.weight_sample is not None:
             weight_sample_idx = self.weight_sample[index]
-        if self.transform is not None:
-            img = self.transform(img)
-        if self.weight_sample is not None:
-            return img, target, weight_sample_idx, self.imgs[index]
-        else:
-            return img, target, self.imgs[index]
+        if not self.ssl:
+            if self.transform is not None:
+                img = self.transform(img)
+            if self.weight_sample is not None:
+                return img, target, weight_sample_idx, self.imgs[index]
+            else:
+                return img, target, self.imgs[index]
+        if self.ssl:
+            if self.transform is not None:
+                img_q = self.transform(img)
+                img_k = self.transform(img)
+            if self.weight_sample is not None:
+                return img_q, img_k, target, weight_sample_idx, self.imgs[index]
+            else:
+                return img_q, img_k, target, self.imgs[index]
+
     def __len__(self):
         return len(self.imgs)

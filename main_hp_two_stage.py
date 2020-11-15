@@ -12,6 +12,7 @@ from loaders.dataset import *
 from archs.net import * 
 from utils.losses import *
 from utils.operations import *
+from utils.ssl_utils import *
 from copy import deepcopy
 
 parser = argparse.ArgumentParser(description='Train model with')
@@ -33,11 +34,16 @@ def main():
     transform_ssl = transforms.Compose([
         transforms.RandomCrop(32, padding=4),
         transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(),
         transforms.ToTensor(),
         transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
     ])
-
-
+    # Defining the queue and queue pointer
+    K = 3000
+    queue = torch.randn(4096, K) # feature dimension and number of examples in the queue 
+    queue = nn.functional.normalize(queue, dim=0)
+    queue_ptr = torch.zeros(1, dtype=torch.long)
+    
     f_train = open("./data/cifar/lists/train.txt","r")
     f_list = [line for line in f_train]
     A_train_bank = torch.ones(len(f_list))
@@ -46,7 +52,7 @@ def main():
     f_list = [line for line in f_ssl]
     A_ssl_bank = torch.ones(len(f_list))
 
-    ssl_data = Imagelists(image_list = os.path.join("./data/cifar/lists/ssl.txt"),weight_sample = A_ssl_bank, root="./data/cifar/train/", transform=transform_train)
+    ssl_data = Imagelists(image_list = os.path.join("./data/cifar/lists/ssl.txt"),weight_sample = A_ssl_bank, ssl = True,  root="./data/cifar/train/", transform=transform_train)
     train_data = Imagelists(image_list = os.path.join("./data/cifar/lists/train.txt"),weight_sample = A_train_bank, root="./data/cifar/train/", transform=transform_train)
     val_data = Imagelists(image_list = os.path.join("./data/cifar/lists/val.txt"), weight_sample = None, root="./data/cifar/train/", transform=transform_val)
 
@@ -58,6 +64,8 @@ def main():
     criterion = CE_Mask().cuda()
     criterion_ssl = CE_Mask().cuda()
     W = AlexNet(criterion = CE_Mask, num_classes = 10).cuda()
+    W_k = AlexNet(criterion = CE_Mask, num_classes =10).cuda() #Dictionary Key encoder
+    W_k.load_state_dict(W.state_dict())
     H = Predictor_deep(criterion = CE_Mask, num_class=10).cuda()
 
     optimizer_H = optim.SGD(H.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
@@ -108,14 +116,14 @@ def main():
         logits = H(W(img_train))
         loss_A_train = criterion(logits,targets_train.cuda(),A_train.cuda())
         change_model(W,freeze=True)
-        loss_A_train.backward() # Updating model 1 time
-        change_model(W,freeze=False)
+        loss_A_train.backward() # Updating weights for model H
         unrolled_H = deepcopy(H)
         unrolled_loss = unrolled_H._loss(W(input_search), target_search, A_train)
-        unrolled_loss.backward()
+        unrolled_loss.backward() # Gradients to update A_train
+        change_model(W,freeze=False)
         unrolled_H_grad_vector = [v.grad.data for v in unrolled_H.parameters()]
         gradients = hessian_vector_product(H, unrolled_H_grad_vector, W(img_train), targets_train, A_train)
-        A_train = A_train - gradients[0]
+        A_train = A_train - gradients[0] # Updating A_train
         A_train = A_train.detach()
         A_train.requires_grad = False
         A_train_bank[idx_train * bs: (idx_train + 1) * bs] = A_train
@@ -125,18 +133,16 @@ def main():
         unrolled_H.zero_grad()
 
         # Update weights W and A_1 with repect to L_ssl and L_val respectively
-        img_ssl, targets_ssl, A_ssl = item_ssl[0].cuda(), item_ssl[1].cuda(), item_ssl[2].cuda()
+        img_ssl_q, img_ssl_k, A_ssl = item_ssl[0].cuda(), item_ssl[1].cuda(), item_ssl[3].cuda()
         A_ssl.requires_grad = True
-        input_search, target_search = item_val[0].cuda(), item_val[1].cuda()
-        logits_ssl = W(img_ssl)
-        loss_A_ssl = criterion(logits_ssl, targets_ssl.cuda(), A_ssl.cuda())
-        loss_A_ssl.backward() # Updating model 1 time
+        ssl_step(W,W_k, optimizer_W, img_ssl_q, img_ssl_k, queue, queue_ptr, K)
         unrolled_W = deepcopy(W)
-        # Here target needs to be changed
-        unrolled_loss = unrolled_W._loss(input_search, target_search, A_ssl)
+        unrolled_loss = unrolled_W._loss(input_search, target_search, A_ssl, H)
+        change_model(H,freeze=True)
         unrolled_loss.backward()
+        change_model(H,freeze=False)
         unrolled_W_grad_vector = [v.grad.data for v in unrolled_W.parameters()]
-        gradients = hessian_vector_product(W, unrolled_W_grad_vector, img_ssl, targets_ssl, A_ssl)
+        gradients = hessian_vector_product_2(W, unrolled_W_grad_vector, img_ssl_q, targets_ssl, A_ssl)
         A_ssl = A_ssl - gradients[0]
         A_ssl = A_ssl.detach()
         A_ssl.requires_grad = False
