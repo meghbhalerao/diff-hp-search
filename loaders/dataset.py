@@ -36,18 +36,18 @@ class Imagelists(object):
         self.root = root
         self.weight_sample = weight_sample
 
-    #def update_weight_sample(self, new_weight_sample):
-        #return new_weight_sample
-
     def __getitem__(self, index):
         path = os.path.join(self.root, self.imgs[index])
         target = self.labels[index]
         img = self.loader(path)
         #weight_sample = self.update_weight_sample(new_weight_sample)
-        weight_sample_idx = self.weight_sample[index]
+        if self.weight_sample is not None:
+            weight_sample_idx = self.weight_sample[index]
         if self.transform is not None:
             img = self.transform(img)
-        return img, target, weight_sample_idx, self.imgs[index]
-
+        if self.weight_sample is not None:
+            return img, target, weight_sample_idx, self.imgs[index]
+        else:
+            return img, target, self.imgs[index]
     def __len__(self):
         return len(self.imgs)

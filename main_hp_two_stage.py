@@ -48,7 +48,7 @@ def main():
 
     ssl_data = Imagelists(image_list = os.path.join("./data/cifar/lists/ssl.txt"),weight_sample = A_ssl_bank, root="./data/cifar/train/", transform=transform_train)
     train_data = Imagelists(image_list = os.path.join("./data/cifar/lists/train.txt"),weight_sample = A_train_bank, root="./data/cifar/train/", transform=transform_train)
-    val_data = Imagelists(image_list = os.path.join("./data/cifar/lists/val.txt"), weight_sample = [A_train_bank,A_ssl_bank], root="./data/cifar/train/", transform=transform_val)
+    val_data = Imagelists(image_list = os.path.join("./data/cifar/lists/val.txt"), weight_sample = None, root="./data/cifar/train/", transform=transform_val)
 
     bs = 100
     train_loader = torch.utils.data.DataLoader(train_data, batch_size=bs, shuffle=True, num_workers=2, drop_last = True)
@@ -57,14 +57,15 @@ def main():
 
     criterion = CE_Mask().cuda()
     criterion_ssl = CE_Mask().cuda()
-    H = AlexNet(criterion = CE_Mask, num_classes = 10).cuda()
-    W = Predictor(num_class=10).cuda()
+    W = AlexNet(criterion = CE_Mask, num_classes = 10).cuda()
+    H = Predictor_deep(criterion = CE_Mask, num_class=10).cuda()
 
     optimizer_H = optim.SGD(H.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
     optimizer_W = optim.SGD(W.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4)
+
     num_iter = 50000
     learning_rate_min =  0.001
-    #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, float(num_iter), eta_min=learning_rate_min)
+    #scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer_, float(num_iter/len(train_loader)), eta_min=learning_rate_min)
     best_val_acc = 0
     best_val_ep = 0
     len_train = len(train_loader)
@@ -73,22 +74,25 @@ def main():
     def change_model(model, freeze = True):
         for params in model.parameters():
             params.requires_grad = not freeze
-
+    
+    print("Training Started, Approx examples - Train %d SSL %d Val %d"%(len_train * bs,len_ssl * bs,len_val * bs))
     for it in range(num_iter):
         if it % len_train == 0:
+            print("Iteration: ", it)
             train_iter = iter(train_loader)
             idx_train = 0
             A_train_bank =  torch.sigmoid(A_train_bank * 2)
-            print(A_train_bank)
+            #print(A_train_bank)
             train_loader.dataset.weight_sample = A_train_bank
-            train_loss, train_acc = get_acc(H,W, criterion, train_loader)
+            if not it == 0:
+                train_loss, train_acc = get_acc(H,W, criterion, train_loader)
+                print("Train Loss: ", train_loss, "Train Acc: ", train_acc)
 
         if it % len_ssl == 0:
             ssl_iter = iter(ssl_loader)
             idx_ssl = 0
             A_ssl_bank =  torch.sigmoid(A_ssl_bank * 2)
-            print(A_ssl_bank)
-            ssl_loader.dataset.weight_sample = A_train_bank
+            ssl_loader.dataset.weight_sample = A_ssl_bank
 
         if it % len_val == 0:
             val_iter = iter(val_loader)
@@ -124,10 +128,11 @@ def main():
         img_ssl, targets_ssl, A_ssl = item_ssl[0].cuda(), item_ssl[1].cuda(), item_ssl[2].cuda()
         A_ssl.requires_grad = True
         input_search, target_search = item_val[0].cuda(), item_val[1].cuda()
-        logits = W(img_ssl)
-        loss_A_ssl = criterion(logits, targets_ssl.cuda(), A_ssl.cuda())
+        logits_ssl = W(img_ssl)
+        loss_A_ssl = criterion(logits_ssl, targets_ssl.cuda(), A_ssl.cuda())
         loss_A_ssl.backward() # Updating model 1 time
         unrolled_W = deepcopy(W)
+        # Here target needs to be changed
         unrolled_loss = unrolled_W._loss(input_search, target_search, A_ssl)
         unrolled_loss.backward()
         unrolled_W_grad_vector = [v.grad.data for v in unrolled_W.parameters()]
@@ -140,12 +145,13 @@ def main():
         optimizer_W.step()
         optimizer_W.zero_grad()
         unrolled_W.zero_grad()
-        scheduler.step()
+        print("Iteration done")
 
 
-def val(model, val_loader, criterion):
-    model.eval()
-    val_loss, val_acc = get_acc(model, criterion, val_loader)
+def val(H,W, val_loader, criterion):
+    H.eval()
+    W.eval()
+    val_loss, val_acc = get_acc(H,W, criterion, val_loader)
     return val_loss, val_acc
 
 def get_acc(H, W, criterion, loader):
