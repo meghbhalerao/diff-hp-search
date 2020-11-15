@@ -104,6 +104,13 @@ def main():
 
         if it % len_val == 0:
             val_iter = iter(val_loader)
+            val_loss, val_acc = val(H,W, val_loader, criterion)
+            print("Saving model ...")
+        if val_acc > best_val_acc:
+            best_val_acc = val_acc
+            best_val_ep = epoch
+            torch.save({'epoch': epoch, 'val_acc': val_acc, 'val_loss': val_loss, 'H': H.state_dict(), 'W': W.state_dict(), 'A_ssl': A_ssl, 'A_train': A_train}, "./model_weights/checkpoint.best.pth.tar")
+
 
         item_train = next(train_iter)
         item_ssl = next(ssl_iter)
@@ -191,12 +198,3 @@ if __name__ == "__main__":
     main()
 
 
-
-
-"""
-print("Saving model ...")
-if val_acc > best_val_acc:
-    best_val_acc = val_acc
-    best_val_ep = epoch
-    torch.save({'epoch': epoch, 'val_acc': val_acc, 'val_loss': val_loss, 'H': H.state_dict(), 'W': W.state_dict(), 'A_ssl': A_ssl, 'A_train': A_train}, "./model_weights/checkpoint.best.pth.tar")
-"""
