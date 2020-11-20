@@ -56,36 +56,26 @@ class AlexNet(nn.Module):
         return self._criterion(logits, target, mask) 
 
     
-class Predictor(nn.Module):
-    def __init__(self, num_class=10, inc=4096, temp=0.05):
-        super(Predictor, self).__init__()
-        self.fc = nn.Linear(inc, num_class, bias=False)
-        self.num_class = num_class
-        self.temp = temp
-
-    def forward(self, x, reverse=False, eta=0.1):
-        x_out = self.fc(x) / self.temp
-        return x_out
-
-    def _loss(self, input, target, mask):
-        logits = self(input)
-        return self._criterion(logits, target, mask) 
-    
-    
  
 class Predictor_deep(nn.Module):
     def __init__(self, criterion, num_class=10, inc=4096, temp=0.05):
         super(Predictor_deep, self).__init__()
-        self.fc1 = nn.Linear(inc, 512)
-        self.fc2 = nn.Linear(512, num_class, bias=False)
+        self.fc1 = nn.Linear(inc, 2048)
+        self.fc2 = nn.Linear(2048, 1024)
+        self.fc3 = nn.Linear(1024, 512)
+        self.fc4 = nn.Linear(512, 256)
+        self.fc5 = nn.Linear(256, num_class)
         self.num_class = num_class
         self.temp = temp
         self._criterion = criterion()
 
-    def forward(self, x, reverse=False, eta=0.1):
+    def forward(self, x):
         x = self.fc1(x)
+        x = self.fc2(x)
+        x = self.fc3(x)
+        x = self.fc4(x)
         x = F.normalize(x)
-        x_out = self.fc2(x) / self.temp
+        x_out = self.fc5(x) / self.temp
         return x_out
 
     def _loss(self, input, target, mask):
