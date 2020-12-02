@@ -7,5 +7,5 @@ This is the code for a small coding experiment that I did, which does a **differ
 2. To run the code to find the weights for each example: `python main_hp.py`
 3. To run the search using the tri-level optimization: `python main_hp_two_stage.py`
 ## References
-1. Momentum Contrast for Unsupervised Visual Representation Learning. _Kaiming He and Haoqi Fan and Yuxin Wu and Saining Xie and Ross Girshick. CVPR 2020._ 
-2. DARTS: Differentiable Architecture Seach. _Hanxiao Liu, Karen Simonyan, Yiming Yang. ICLR 2019._ 
+1. [Momentum Contrast for Unsupervised Visual Representation Learning](https://arxiv.org/abs/1911.05722). _Kaiming He and Haoqi Fan and Yuxin Wu and Saining Xie and Ross Girshick. CVPR 2020._ 
+2. [DARTS: Differentiable Architecture Seach](https://arxiv.org/abs/1806.09055). _Hanxiao Liu, Karen Simonyan, Yiming Yang. ICLR 2019._ 
