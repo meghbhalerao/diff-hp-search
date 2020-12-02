@@ -6,6 +6,8 @@ This is the code for a small coding experiment that I did, which does a **differ
 1. Download **CIFAR-10** or any other dataset according to your liking and split them into train and val (for `main_hp.py`), or train, train_unlabelled, val (for `python main_hp_two_stage.py`)
 2. To run the code to find the weights for each example: `python main_hp.py`
 3. To run the search using the tri-level optimization: `python main_hp_two_stage.py`
+## Dependencies
+- [`pytorch`](https://pytorch.org)
 ## References
 1. [Momentum Contrast for Unsupervised Visual Representation Learning](https://arxiv.org/abs/1911.05722). _Kaiming He and Haoqi Fan and Yuxin Wu and Saining Xie and Ross Girshick. CVPR 2020._ 
 2. [DARTS: Differentiable Architecture Seach](https://arxiv.org/abs/1806.09055). _Hanxiao Liu, Karen Simonyan, Yiming Yang. ICLR 2019._ 
